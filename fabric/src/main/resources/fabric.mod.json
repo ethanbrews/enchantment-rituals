@@ -16,10 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.ethanbrews.fabric.ExampleModFabric"
+      "me.ethanbrews.fabric.EnchantmentRitualsFabric"
     ],
     "client": [
-      "me.ethanbrews.fabric.client.ExampleModFabricClient"
+      "me.ethanbrews.fabric.client.EnchantmentRitualsFabricClient"
     ]
   },
   "mixins": [
