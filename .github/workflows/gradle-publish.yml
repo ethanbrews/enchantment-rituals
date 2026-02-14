@@ -1,0 +1,53 @@
+name: Gradle Package
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Changed to write for uploading release assets
+      packages: write
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        server-id: github
+        settings-path: ${{ github.workspace }}
+    
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    
+    - name: Build with Gradle
+      run: ./gradlew clean build
+    
+    - name: Publish to GitHub Packages
+      run: ./gradlew publish
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Upload built JARs as release assets
+    - name: Upload Fabric JAR
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./fabric/build/libs/enchantmentrituals-fabric-${{ github.event.release.tag_name }}.jar
+        asset_name: enchantmentrituals-fabric-${{ github.event.release.tag_name }}.jar
+        asset_content_type: application/java-archive
+    
+    - name: Upload Forge JAR
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./forge/build/libs/enchantmentrituals-forge-${{ github.event.release.tag_name }}.jar
+        asset_name: enchantmentrituals-forge-${{ github.event.release.tag_name }}.jar
+        asset_content_type: application/java-archive
