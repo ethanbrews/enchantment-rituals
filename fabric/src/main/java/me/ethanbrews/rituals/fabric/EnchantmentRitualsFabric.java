@@ -1,4 +1,4 @@
-package me.ethanbrews.fabric;
+package me.ethanbrews.rituals.fabric;
 
 import net.fabricmc.api.ModInitializer;
 

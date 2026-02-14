@@ -16,10 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.ethanbrews.fabric.EnchantmentRitualsFabric"
+      "me.ethanbrews.rituals.fabric.EnchantmentRitualsFabric"
     ],
     "client": [
-      "me.ethanbrews.fabric.client.EnchantmentRitualsFabricClient"
+      "me.ethanbrews.rituals.fabric.client.EnchantmentRitualsFabricClient"
     ]
   },
   "mixins": [

@@ -1,4 +1,4 @@
-package me.ethanbrews.rituals.data;
+package me.ethanbrews.rituals.ritual;
 
 import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
 

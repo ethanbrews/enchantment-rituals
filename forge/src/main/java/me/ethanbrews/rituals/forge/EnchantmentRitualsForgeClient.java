@@ -1,4 +1,4 @@
-package me.ethanbrews.forge;
+package me.ethanbrews.rituals.forge;
 
 import me.ethanbrews.rituals.EnchantmentRituals;
 import net.minecraftforge.api.distmarker.Dist;

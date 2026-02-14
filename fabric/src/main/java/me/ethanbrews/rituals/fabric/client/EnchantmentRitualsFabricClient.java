@@ -1,4 +1,4 @@
-package me.ethanbrews.fabric.client;
+package me.ethanbrews.rituals.fabric.client;
 
 import me.ethanbrews.rituals.EnchantmentRituals;
 import net.fabricmc.api.ClientModInitializer;

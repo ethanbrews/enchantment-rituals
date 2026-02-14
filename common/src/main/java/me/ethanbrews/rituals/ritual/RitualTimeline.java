@@ -1,6 +1,4 @@
-package me.ethanbrews.rituals.data;
-
-import me.ethanbrews.rituals.RitualException;
+package me.ethanbrews.rituals.ritual;
 
 import java.util.ArrayList;
 import java.util.List;

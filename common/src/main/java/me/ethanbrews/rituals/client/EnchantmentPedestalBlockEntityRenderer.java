@@ -1,8 +1,8 @@
-package me.ethanbrews.rituals.block;
+package me.ethanbrews.rituals.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import me.ethanbrews.rituals.Ritual;
+import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
 import me.ethanbrews.rituals.particle.RitualConsumeParticleOptions;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

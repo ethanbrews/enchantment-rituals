@@ -1,7 +1,4 @@
-package me.ethanbrews.rituals.data;
-
-import me.ethanbrews.rituals.RitualException;
-import me.ethanbrews.rituals.RitualPattern;
+package me.ethanbrews.rituals.ritual;
 
 import java.util.HashSet;
 import java.util.Set;

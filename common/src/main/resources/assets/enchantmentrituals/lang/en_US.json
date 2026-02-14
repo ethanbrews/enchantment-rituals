@@ -1,4 +1,5 @@
 {
   "itemGroup.enchantmentrituals.general": "Enchantment Rituals",
-  "block.enchantmentrituals.enchant_pedestal": "Enchantment Pedestal"
+  "block.enchantmentrituals.enchant_pedestal": "Enchantment Pedestal",
+  "jei.category.ritual": "Enchantment Ritual"
 }

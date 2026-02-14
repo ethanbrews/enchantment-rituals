@@ -1,6 +1,5 @@
-package me.ethanbrews.rituals.data;
+package me.ethanbrews.rituals.ritual;
 
-import me.ethanbrews.rituals.RitualException;
 import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
 
 public class RitualEvent {

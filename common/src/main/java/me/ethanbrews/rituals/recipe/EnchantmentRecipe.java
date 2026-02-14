@@ -1,7 +1,6 @@
-package me.ethanbrews.rituals.data;
+package me.ethanbrews.rituals.recipe;
 
 import com.mojang.logging.LogUtils;
-import me.ethanbrews.rituals.RitualException;
 import me.ethanbrews.rituals.util.XpHelper;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.registries.BuiltInRegistries;

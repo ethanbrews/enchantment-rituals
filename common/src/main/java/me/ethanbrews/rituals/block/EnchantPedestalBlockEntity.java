@@ -2,9 +2,9 @@ package me.ethanbrews.rituals.block;
 
 import com.mojang.logging.LogUtils;
 import me.ethanbrews.rituals.EnchantmentRituals;
-import me.ethanbrews.rituals.Ritual;
-import me.ethanbrews.rituals.RitualException;
-import me.ethanbrews.rituals.data.RitualEventHandler;
+import me.ethanbrews.rituals.ritual.Ritual;
+import me.ethanbrews.rituals.ritual.RitualException;
+import me.ethanbrews.rituals.ritual.RitualEventHandler;
 import me.ethanbrews.rituals.util.SingleItemContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

@@ -1,11 +1,9 @@
-package me.ethanbrews.rituals;
+package me.ethanbrews.rituals.ritual;
 
 import com.mojang.logging.LogUtils;
+import me.ethanbrews.rituals.EnchantmentRituals;
 import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
-import me.ethanbrews.rituals.data.EnchantmentRecipe;
-import me.ethanbrews.rituals.data.RitualEvent;
-import me.ethanbrews.rituals.data.RitualEventDispatcher;
-import me.ethanbrews.rituals.data.RitualTimeline;
+import me.ethanbrews.rituals.recipe.EnchantmentRecipe;
 import me.ethanbrews.rituals.util.RecipeHelper;
 import net.minecraft.util.Tuple;
 import org.slf4j.Logger;

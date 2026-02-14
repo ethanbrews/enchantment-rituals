@@ -2,8 +2,8 @@ package me.ethanbrews.rituals.block;
 
 import com.mojang.logging.LogUtils;
 import me.ethanbrews.rituals.EnchantmentRituals;
-import me.ethanbrews.rituals.Ritual;
-import me.ethanbrews.rituals.RitualException;
+import me.ethanbrews.rituals.ritual.Ritual;
+import me.ethanbrews.rituals.ritual.RitualException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
