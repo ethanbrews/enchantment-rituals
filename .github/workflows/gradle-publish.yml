@@ -31,23 +31,19 @@ jobs:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
-    # Upload built JARs as release assets
-    - name: Upload Fabric JAR
-      uses: actions/upload-release-asset@v1
+    - name: Upload Release Assets
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./fabric/build/libs/enchantmentrituals-fabric-${{ github.event.release.tag_name }}.jar
-        asset_name: enchantmentrituals-fabric-${{ github.event.release.tag_name }}.jar
-        asset_content_type: application/java-archive
-    
-    - name: Upload Forge JAR
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./forge/build/libs/enchantmentrituals-forge-${{ github.event.release.tag_name }}.jar
-        asset_name: enchantmentrituals-forge-${{ github.event.release.tag_name }}.jar
-        asset_content_type: application/java-archive
+      run: |
+        VERSION="${{ github.event.release.tag_name }}"
+        VERSION="${VERSION#v}"
+        
+        # Upload all variants
+        gh release upload ${{ github.event.release.tag_name }} \
+          "fabric/build/libs/enchantmentrituals-fabric-${VERSION}.jar" \
+          "fabric/build/libs/enchantmentrituals-fabric-${VERSION}-sources.jar" \
+          "fabric/build/libs/enchantmentrituals-fabric-${VERSION}-dev-shadow.jar" \
+          "forge/build/libs/enchantmentrituals-forge-${VERSION}.jar" \
+          "forge/build/libs/enchantmentrituals-forge-${VERSION}-sources.jar" \
+          "forge/build/libs/enchantmentrituals-forge-${VERSION}-dev-shadow.jar" \
+          --clobber
