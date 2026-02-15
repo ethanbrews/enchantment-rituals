@@ -16,10 +16,13 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static me.ethanbrews.rituals.util.MathHelper.roundUpToMultiple;
+
 public class RitualCategory implements IRecipeCategory<IEnchantmentRitualRecipe> {
     private final IDrawable icon;
     private final IDrawable slot;
     private final IDrawable arrow;
+    private static final int columns = 4;
 
     public RitualCategory(IGuiHelper helper) {
         this.icon = helper.createDrawableIngredient(
@@ -49,13 +52,13 @@ public class RitualCategory implements IRecipeCategory<IEnchantmentRitualRecipe>
             double mouseY
     ) {
         IRecipeCategory.super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
-        for (int i = 0; i < 6; i++) {
-            int col = i % 3;
-            int row = i / 3;
+        for (int i = 0; i < roundUpToMultiple(recipe.ingredientsCount(), columns); i++) {
+            int col = i % columns;
+            int row = i / columns;
             slot.draw(graphics, 69 + (col * 19), 2 + (row * 19));
-            arrow.draw(graphics, 36, 12);
-            slot.draw(graphics, 9, 11);
         }
+        arrow.draw(graphics, 36, 12);
+        slot.draw(graphics, 9, 11);
     }
 
     @Override
@@ -79,6 +82,11 @@ public class RitualCategory implements IRecipeCategory<IEnchantmentRitualRecipe>
             @NotNull IEnchantmentRitualRecipe recipe,
             @NotNull IFocusGroup focuses
     ) {
-        // TODO: Build slots
+        for (int i = 0; i < recipe.ingredientsCount(); i++) {
+            int col = i % columns;
+            int row = i / columns;
+            builder.addSlot(RecipeIngredientRole.INPUT, 70 + (col * 19), 3 + (row * 19))
+                    .addItemStack(recipe.getIngredient(i));
+        }
     }
 }

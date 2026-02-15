@@ -8,7 +8,7 @@ public class RitualRecipeProvider {
 
     public static List<IEnchantmentRitualRecipe> getAll() {
         return EnchantmentRituals.getEnchantmentRecipes().stream()
-                .map(r -> (IEnchantmentRitualRecipe) new EnchantmentRitualRecipe())
+                .map(r -> (IEnchantmentRitualRecipe) new EnchantmentRitualRecipe(r))
                 .toList();
     }
 }
