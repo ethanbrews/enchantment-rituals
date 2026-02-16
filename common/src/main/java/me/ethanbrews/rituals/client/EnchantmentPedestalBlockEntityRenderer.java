@@ -33,7 +33,7 @@ public class EnchantmentPedestalBlockEntityRenderer implements BlockEntityRender
 
     private void renderItemOnPedestal(EnchantPedestalBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        ItemStack stack = blockEntity.getItem();
+        ItemStack stack = blockEntity.getItemStack();
         if (stack.isEmpty()) {
             return;
         }
@@ -130,7 +130,7 @@ public class EnchantmentPedestalBlockEntityRenderer implements BlockEntityRender
         BlockPos controllerPos = blockEntity.getControllerPos();
         if (level == null || controllerPos == null) return;
 
-        ItemStack stack = blockEntity.getItem();
+        ItemStack stack = blockEntity.getItemStack();
         if (stack.isEmpty()) return;
 
         if (level.random.nextFloat() > 0.3f) return;

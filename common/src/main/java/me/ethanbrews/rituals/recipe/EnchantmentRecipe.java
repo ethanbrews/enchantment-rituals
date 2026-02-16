@@ -1,127 +1,204 @@
 package me.ethanbrews.rituals.recipe;
 
 import com.mojang.logging.LogUtils;
+import me.ethanbrews.rituals.util.EnchantmentHelper;
 import me.ethanbrews.rituals.util.XpHelper;
 import net.minecraft.ResourceLocationException;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 public record EnchantmentRecipe(
-        String enchantment,
-        String[][] ingredients,
-        int cost,
-        int level,
-        float failureChance,
-        int duration
+        @Nullable RecipeInputOrOutput upgrade,
+        @NotNull RecipeInputOrOutput result,
+        @NotNull  IngredientSlot[] ingredients,
+        @NotNull  RitualCost cost,
+        @Nullable Float failureChance,
+        @NotNull  String duration
 ) {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public int getXpCost(Player player) {
-        return Math.min(0, XpHelper.getLevelCostInXP(player, cost));
+        return Math.min(0, XpHelper.getLevelCostInXP(player, cost.levels()));
     }
 
-    public boolean canPlayerAffordRecipe(Player player) {
-        return cost <= 0 || XpHelper.getLevelCostInXP(player, cost) > 0;
+    public boolean canPlayerAffordXpCost(Player player) {
+        return cost.levels() <= 0 || getXpCost(player) > 0;
     }
 
-    /**
-     * Converts a 2D ingredient string array to a 2D Item array.
-     * Supports both direct items ("minecraft:diamond") and tags ("#minecraft:planks").
-     * Tags are prefixed with '#'.
-     *
-     * @return 2D array of Items, or null if any slot has no valid items
-     */
-    public @Nullable Item[][] parseIngredients() {
-        List<Item[]> result = new ArrayList<>();
+    public int getTickDuration() {
+        if (duration.endsWith("t")) {
+            return Integer.parseInt(duration.substring(0, duration.length() - 1));
+        } else if (duration.endsWith("s")) {
+            int seconds = Integer.parseInt(duration.substring(0, duration.length() - 1));
+            return seconds * 20; // 20 ticks per second in Minecraft
+        } else {
+            // Default to ticks if no suffix
+            return Integer.parseInt(duration);
+        }
+    }
 
-        for (int slotIndex = 0; slotIndex < ingredients.length; slotIndex++) {
-            String[] options = ingredients[slotIndex];
-            Set<Item> validItems = new LinkedHashSet<>(); // Use Set to avoid duplicates
+    public ItemStack applyRecipeOutput(ItemStack targetStack) throws IllegalArgumentException {
+        if (!(canUpgrade(targetStack))) throw new IllegalArgumentException("Cannot upgrade " + targetStack);
+        if (result.isItem()) {
+            return result.getItemStack();
+        }
+        assert result.isEnchantment();
+        assert result.getEnchantmentIdentifier() != null;
+        var ench = result.getEnchantmentIdentifier().getEnchantment();
+        assert ench != null;
+        var level = result.getEnchantmentIdentifier().getLevel();
+        assert ench.canEnchant(targetStack);
+        targetStack.enchant(ench, level);
+        return targetStack;
+    }
 
-            for (String itemId : options) {
-                try {
-                    if (itemId.startsWith("#")) {
-                        // It's a tag
-                        ResourceLocation tagLocation = new ResourceLocation(itemId.substring(1));
-                        TagKey<Item> tag = TagKey.create(Registries.ITEM, tagLocation);
+    public boolean canUpgrade(ItemStack targetStack) {
+        if (upgrade == null) {
+            // No upgrade requirement - just check if enchantment can be applied
+            if (result.isItem()) return true;
 
-                        // Get all items in the tag
-                        BuiltInRegistries.ITEM.getTag(tag).ifPresent(holders -> {
-                            holders.forEach(holder -> validItems.add(holder.value()));
-                        });
+            var enchId = result.enchantment();
+            assert enchId != null;
+            var ench = enchId.getEnchantment();
+            assert ench != null;
 
-                        if (validItems.isEmpty()) {
-                            LOGGER.error("Tag is empty or doesn't exist: {}", itemId);
-                        }
+            // Check if the enchantment can be applied to this item
+            if (!ench.canEnchant(targetStack)) {
+                return false;
+            }
 
-                    } else {
-                        // It's a direct item
-                        ResourceLocation resourceLocation = new ResourceLocation(itemId);
-                        Item item = BuiltInRegistries.ITEM.get(resourceLocation);
+            // Check if target already has this enchantment at a lower level
+            int currentLevel = EnchantmentHelper.getLevel(ench, targetStack);
+            int requiredLevel = enchId.getLevel();
 
-                        if (item != Items.AIR) {
-                            validItems.add(item);
-                        } else {
-                            LOGGER.error("Unknown item: {}", itemId);
-                        }
-                    }
-                } catch (ResourceLocationException e) {
-                    LOGGER.error("Invalid resource location: {}", itemId);
+            // Allow if: no enchantment yet (level 0) or current level is less than required
+            return currentLevel < requiredLevel;
+
+        } else {
+            // Has upgrade requirement - check target matches the upgrade condition
+
+            boolean itemMatches = true;
+            boolean enchantmentMatches = true;
+
+            // Check item requirement if specified
+            if (upgrade.isItem()) {
+                var upgradeItem = upgrade.getItemStack();
+                if (upgradeItem == null) {
+                    itemMatches = false;
+                } else {
+                    itemMatches = ItemStack.isSameItem(targetStack, upgradeItem);
                 }
             }
 
-            // If no valid items for this slot, recipe is invalid
-            if (validItems.isEmpty()) {
-                LOGGER.error("No valid items found for ingredient slot {}", slotIndex);
-                return null;
+            // Check enchantment requirement if specified
+            if (upgrade.isEnchantment()) {
+                var upgradeEnchId = upgrade.getEnchantmentIdentifier();
+                if (upgradeEnchId == null) {
+                    enchantmentMatches = false;
+                } else {
+                    var upgradeEnch = upgradeEnchId.getEnchantment();
+                    if (upgradeEnch == null) {
+                        enchantmentMatches = false;
+                    } else {
+                        int currentLevel = EnchantmentHelper.getLevel(upgradeEnch, targetStack);
+                        int requiredLevel = upgradeEnchId.getLevel();
+
+                        // Must have at least this level
+                        enchantmentMatches = currentLevel >= requiredLevel;
+                    }
+                }
             }
 
-            result.add(validItems.toArray(new Item[0]));
+            // Both conditions must be satisfied (if specified)
+            return itemMatches && enchantmentMatches;
         }
-
-        return result.toArray(new Item[0][]);
     }
 
-    /**
-     * Parses the enchantment string to an Enchantment.
-     * Supports direct enchantments ("minecraft:sharpness").
-     * Tags are not supported for single enchantment results.
-     * Result is cached after first parse.
-     *
-     * @return The Enchantment, or null if invalid
-     */
-    public Enchantment getEnchantment() {
-        if (enchantment == null || enchantment.isEmpty()) {
-            return null;
+    public float getFailureChance() {
+        return Objects.requireNonNullElse(failureChance, 0f);
+    }
+
+    public Item[][] getIngredients() throws ResourceLocationException {
+        Item[][] result = new Item[ingredients.length][];
+        List<String> emptySlots = new ArrayList<>();
+
+        for (int i = 0; i < ingredients.length; i++) {
+            try {
+                result[i] = ingredients[i].getIngredients();
+            } catch (ResourceLocationException e) {
+                // Collect which slots failed
+                emptySlots.add("slot " + i + " (" + e.getMessage() + ")");
+            }
+        }
+
+        // If any slots are empty, fail the entire recipe
+        if (!emptySlots.isEmpty()) {
+            throw new ResourceLocationException(
+                    "Recipe has empty ingredient slots: " + String.join("; ", emptySlots)
+            );
+        }
+
+        return result;
+    }
+
+    public boolean isEnchantment() {
+        return result.isEnchantment();
+    }
+
+    public boolean isItem() {
+        return result.isItem();
+    }
+
+    public @Nullable Enchantment getEnchantment() throws IllegalStateException {
+        if (!(result.isEnchantment())) {
+            throw new IllegalStateException("Called getEnchantment on a recipe that produces an item.");
+        }
+        assert result.enchantment() != null;
+        return result.enchantment().getEnchantment();
+    }
+
+    public @Nullable ItemStack getItemStack() throws IllegalStateException {
+        if (!(result.isItem())) {
+            throw new IllegalStateException("Called getEnchantment on a recipe that produces an item.");
+        }
+        return result.getItemStack();
+    }
+
+    public boolean isValidRecipe() {
+        try {
+            getIngredients();
+        } catch (ResourceLocationException e) {
+            return false;
         }
 
         try {
-            ResourceLocation resourceLocation = new ResourceLocation(enchantment);
-            var ench = BuiltInRegistries.ENCHANTMENT.get(resourceLocation);
-
-            if (ench != null) {
-                return ench;
-            } else {
-                LOGGER.error("Unknown enchantment: {}", enchantment);
-                return null;
-            }
-        } catch (ResourceLocationException e) {
-            LOGGER.error("Invalid enchantment resource location: {}", enchantment);
-            return null;
+            getTickDuration();
+        } catch (NumberFormatException e) {
+            return false;
         }
+
+        if (!(result.isValidOutput())) {
+            return false;
+        }
+
+        if (upgrade != null && !(upgrade.isValidInput())) {
+            return false;
+        }
+
+        if (isEnchantment()) {
+            return getEnchantment() != null;
+        } else if (isItem()) {
+            return getItemStack() != null;
+        }
+        return false;
     }
 }
 

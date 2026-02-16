@@ -82,7 +82,7 @@ public class EnchantPedestalBlock extends Block implements EntityBlock {
         }
 
         ItemStack heldItem = player.getItemInHand(hand);
-        ItemStack storedItem = pedestalEntity.getItem();
+        ItemStack storedItem = pedestalEntity.getItemStack();
 
         if (heldItem.isEmpty() && player.isCrouching()) {
             try {
@@ -99,14 +99,14 @@ public class EnchantPedestalBlock extends Block implements EntityBlock {
             if (!player.getInventory().add(storedItem)) {
                 player.drop(storedItem, false);
             }
-            pedestalEntity.setItem(ItemStack.EMPTY);
+            pedestalEntity.setItemStack(ItemStack.EMPTY);
             pedestalEntity.setChanged();
             return InteractionResult.SUCCESS;
         }
 
         if (!heldItem.isEmpty()) {
             ItemStack toStore = heldItem.split(1);
-            pedestalEntity.setItem(toStore);
+            pedestalEntity.setItemStack(toStore);
             pedestalEntity.setChanged();
             return InteractionResult.SUCCESS;
         }

@@ -11,12 +11,14 @@ import me.ethanbrews.rituals.block.EnchantPedestalBlock;
 import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
 import me.ethanbrews.rituals.client.EnchantmentPedestalBlockEntityRenderer;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
-import me.ethanbrews.rituals.recipe.EnchantmentRecipe;
+import me.ethanbrews.rituals.recipe.*;
 import me.ethanbrews.rituals.particle.RitualConsumeParticleOptions;
 import me.ethanbrews.rituals.particle.RitualConsumeParticleProvider;
+import me.ethanbrews.rituals.util.RecipeHelper;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -67,6 +69,8 @@ public final class EnchantmentRituals {
                     }
             );
 
+    private static List<EnchantmentRecipe> _recipes = List.of();
+
     public static void init() {
         BLOCKS.register();
         ITEMS.register();
@@ -74,15 +78,27 @@ public final class EnchantmentRituals {
         PARTICLES.register();
     }
 
+    public static void reload(ResourceManager resourceManager) {
+        _recipes = RecipeHelper.loadRecipes(resourceManager)
+                .values()
+                .stream()
+                .filter(EnchantmentRecipe::isValidRecipe)
+                .toList();
+    }
+
     public static List<EnchantmentRecipe> getEnchantmentRecipes() {
         return List.of(new EnchantmentRecipe(
-                "minecraft:sharpness",
-                new String[][]{{"minecraft:quartz"}, {"minecraft:quartz"}, {"minecraft:quartz"}, {"minecraft:quartz"}},
-                10,
-                1,
-                0.0f,
-                20*10
-
+                null,
+                new RecipeInputOrOutput(new EnchantmentIdentifier("minecraft:sharpness", 1), null),
+                new IngredientSlot[]{
+                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
+                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
+                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
+                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
+                },
+                new RitualCost(3),
+                null,
+                "10s"
         ));
     }
 

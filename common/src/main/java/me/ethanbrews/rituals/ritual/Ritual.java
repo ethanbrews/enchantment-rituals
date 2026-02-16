@@ -27,10 +27,10 @@ public class Ritual {
         this.controller = controller;
         this.others = others;
         this.ritualRecipe = recipe;
-        var willFail = random.nextFloat() < ritualRecipe.failureChance();
-        var timeline = generateEventTimeline(recipe.duration(), this.others);
+        var willFail = random.nextFloat() < ritualRecipe.getFailureChance();
+        var timeline = generateEventTimeline(recipe.getTickDuration(), this.others);
         if (willFail) {
-            timeline.addEvent(RitualEvent.fail(random.nextInt(0, recipe.duration())));
+            timeline.addEvent(RitualEvent.fail(random.nextInt(0, recipe.getTickDuration())));
         }
         this.dispatcher = new RitualEventDispatcher(timeline);
     }
@@ -100,19 +100,19 @@ public class Ritual {
         // Start by inspecting the world for a valid configuration of pedestals.
         var patternOthersPair = findPattern(controller);
         var others = patternOthersPair.getB();
-        var target = controller.getItem();
+        var target = controller.getItemStack();
         if (target.isEmpty()) {
             throw new RitualException("No target item to enchant.");
         }
         var ingredients = others.stream()
-                .map(EnchantPedestalBlockEntity::getItem)
+                .map(EnchantPedestalBlockEntity::getItemStack)
                 .filter(s -> !(s.isEmpty()))
                 .toList();
 
         EnchantmentRecipe foundRecipe = null;
         for (var recipe : EnchantmentRituals.getEnchantmentRecipes()) {
             if (!(Objects.requireNonNull(recipe.getEnchantment()).canEnchant(target))) { continue; }
-            if (!(RecipeHelper.validateIngredients(ingredients, recipe.parseIngredients()))) { continue; }
+            if (!(RecipeHelper.validateIngredients(ingredients, recipe.getIngredients()))) { continue; }
             foundRecipe = recipe;
             break;
         }

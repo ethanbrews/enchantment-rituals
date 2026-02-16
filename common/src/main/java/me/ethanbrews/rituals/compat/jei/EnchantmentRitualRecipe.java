@@ -15,12 +15,12 @@ public class EnchantmentRitualRecipe implements IEnchantmentRitualRecipe {
 
     public EnchantmentRitualRecipe(EnchantmentRecipe r) {
         this.recipe = r;
-        this.parsedIngredients = r.parseIngredients();
+        this.parsedIngredients = r.getIngredients();
     }
 
     @Override
     public int ingredientsCount() {
-        return recipe.parseIngredients().length;
+        return recipe.getIngredients().length;
     }
 
     @Override

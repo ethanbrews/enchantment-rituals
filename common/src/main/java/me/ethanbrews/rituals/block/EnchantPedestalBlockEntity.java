@@ -147,11 +147,11 @@ public class EnchantPedestalBlockEntity extends BlockEntity implements RitualEve
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public ItemStack getItem() {
+    public ItemStack getItemStack() {
         return container.peek();
     }
 
-    public void setItem(ItemStack stack) {
+    public void setItemStack(ItemStack stack) {
         container.set(stack);
     }
 
@@ -184,16 +184,22 @@ public class EnchantPedestalBlockEntity extends BlockEntity implements RitualEve
     @Override
     public void success() {
         if (this.ritual.getController() == this) {
-            var ench = this.ritual.getRecipe().getEnchantment();
-            var level = this.ritual.getRecipe().level();
-            assert ench != null;
-            var item = getItem();
-            if (item.isEmpty() || !ench.canEnchant(item)) {
+            var itemStack = getItemStack();
+            if (itemStack == null || itemStack.isEmpty()) {
                 LOGGER.error("Item was removed before ritual ended!");
-                // TODO: Fail here
+                // TODO: Fail here!
+            } else if (!(this.ritual.getRecipe().canUpgrade(itemStack))) {
+                LOGGER.error("Item has become invalid during ritual!");
+                // TODO: Fail here!
             } else {
-                item.enchant(ench, level);
+                try {
+                    itemStack = this.ritual.getRecipe().applyRecipeOutput(itemStack);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException(e);
+                }
             }
+
+            setItemStack(itemStack);
         }
 
         if ((this.ritual.getController() == this) && (level instanceof ServerLevel serverLevel)) {

@@ -1,0 +1,16 @@
+{
+  "result": {
+    "enchantment": {
+      "enchantment": "minecraft:sharpness",
+      "level": 1
+    }
+  },
+  "ingredients": [
+    {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]},
+    {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]},
+    {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]},
+    {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]}
+  ],
+  "cost": {"levels": 4},
+  "duration": "10s"
+}
