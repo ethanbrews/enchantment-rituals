@@ -1,9 +1,14 @@
 package me.ethanbrews.rituals.ritual;
 
+import com.mojang.logging.LogUtils;
+import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class RitualTimeline {
+    private static final Logger LOGGER = LogUtils.getLogger();
     List<RitualEvent> events;
     Integer index = null;
 
@@ -44,5 +49,13 @@ public class RitualTimeline {
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
+    }
+
+    public void emitTimelineDebugLogs() {
+        LOGGER.info("=== Emitting timeline debug logs ===");
+        for (var event : this.events) {
+            LOGGER.info("{} ticks -> {} @ {}", event.getTime(), event.getType(), event.getData());
+        }
+        LOGGER.info("=== End timeline debug logs ===");
     }
 }

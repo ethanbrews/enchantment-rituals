@@ -1,9 +1,9 @@
 package me.ethanbrews.rituals.block;
 
 import com.mojang.logging.LogUtils;
-import me.ethanbrews.rituals.EnchantmentRituals;
 import me.ethanbrews.rituals.ritual.Ritual;
 import me.ethanbrews.rituals.ritual.RitualException;
+import me.ethanbrews.rituals.ritual.RitualTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -27,8 +28,8 @@ import org.slf4j.Logger;
 
 public class EnchantPedestalBlock extends Block implements EntityBlock {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public EnchantPedestalBlock(Properties properties) {
-        super(properties);
+    public EnchantPedestalBlock() {
+        super(BlockBehaviour.Properties.of());
     }
 
     @Override
@@ -53,7 +54,7 @@ public class EnchantPedestalBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new EnchantPedestalBlockEntity(blockPos, blockState);
+        return new EnchantPedestalBlockEntity(blockPos, blockState, RitualTier.TIER1);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class EnchantPedestalBlock extends Block implements EntityBlock {
         }
 
         // Make sure the type matches your block entity type
-        return type == EnchantmentRituals.ENCHANTMENT_PEDESTAL_BE.get() ?
+        return type == EnchantmentRitualBlocks.ENCHANTMENT_PEDESTAL_BE.get() ?
                 (lvl, pos, st, be) -> ((EnchantPedestalBlockEntity) be).tick(lvl, pos, st) :
                 null;
     }
@@ -86,9 +87,10 @@ public class EnchantPedestalBlock extends Block implements EntityBlock {
 
         if (heldItem.isEmpty() && player.isCrouching()) {
             try {
-                Ritual.startRitual(pedestalEntity);
+                Ritual.startRitual(pedestalEntity, player);
             } catch (RitualException e) {
                 LOGGER.info("Could not start ritual", e);
+                pedestalEntity.spawnFailureParticles(level, pos);
                 return InteractionResult.FAIL;
             }
             return InteractionResult.SUCCESS;

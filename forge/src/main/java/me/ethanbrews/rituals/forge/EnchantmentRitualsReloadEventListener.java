@@ -1,6 +1,7 @@
 package me.ethanbrews.rituals.forge;
 
 import me.ethanbrews.rituals.EnchantmentRituals;
+import me.ethanbrews.rituals.recipe.EnchantmentRecipeRegistry;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -32,7 +33,7 @@ public class EnchantmentRitualsReloadEventListener {
                             .thenCompose(stage::wait)
                             .thenRunAsync(() -> {
                                 // Apply on game thread
-                                EnchantmentRituals.reload(resourceManager);
+                                EnchantmentRecipeRegistry.loadRecipes(resourceManager);
                             }, gameExecutor);
                 }
             });

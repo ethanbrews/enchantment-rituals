@@ -1,118 +1,31 @@
 package me.ethanbrews.rituals;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.mojang.serialization.Codec;
-import dev.architectury.registry.client.particle.ParticleProviderRegistry;
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrarManager;
-import dev.architectury.registry.registries.RegistrySupplier;
-import me.ethanbrews.rituals.block.EnchantPedestalBlock;
-import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
-import me.ethanbrews.rituals.client.EnchantmentPedestalBlockEntityRenderer;
-import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
+import com.mojang.logging.LogUtils;
+import me.ethanbrews.rituals.block.EnchantmentRitualBlocks;
+import me.ethanbrews.rituals.item.EnchantmentRitualItems;
+import me.ethanbrews.rituals.particle.EnchantmentRitualParticles;
 import me.ethanbrews.rituals.recipe.*;
-import me.ethanbrews.rituals.particle.RitualConsumeParticleOptions;
-import me.ethanbrews.rituals.particle.RitualConsumeParticleProvider;
 import me.ethanbrews.rituals.util.RecipeHelper;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.List;
 
 public final class EnchantmentRituals {
+    private static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "enchantmentrituals";
 
-    public static final Supplier<RegistrarManager> MANAGER = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
-    public static final DeferredRegister<Block> BLOCKS =
-            DeferredRegister.create(MOD_ID, Registries.BLOCK);
-    public static final DeferredRegister<Item> ITEMS =
-            DeferredRegister.create(MOD_ID, Registries.ITEM);
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
-            DeferredRegister.create(MOD_ID, Registries.BLOCK_ENTITY_TYPE);
-    public static final DeferredRegister<ParticleType<?>> PARTICLES =
-            DeferredRegister.create(MOD_ID, Registries.PARTICLE_TYPE);
-
-    public static final RegistrySupplier<Block> ENCHANTMENT_PEDESTAL_BLOCK =
-            BLOCKS.register("enchant_pedestal", () -> new EnchantPedestalBlock(BlockBehaviour.Properties.of()));
-    public static final RegistrySupplier<BlockItem> ENCHANTMENT_PEDESTAL_BLOCK_ITEM =
-            ITEMS.register("enchant_pedestal", () ->
-                    new BlockItem(ENCHANTMENT_PEDESTAL_BLOCK.get(), new Item.Properties())
-            );
-
-    public static final RegistrySupplier<BlockEntityType<EnchantPedestalBlockEntity>> ENCHANTMENT_PEDESTAL_BE =
-            BLOCK_ENTITY_TYPES.register("enchant_pedestal_entity",()->
-                BlockEntityType.Builder.of(
-                        EnchantPedestalBlockEntity::new,
-                        ENCHANTMENT_PEDESTAL_BLOCK.get()).build(null));
-
-    public static final RegistrySupplier<ParticleType<RitualConsumeParticleOptions>> RITUAL_CONSUME_PARTICLE =
-            PARTICLES.register("ritual_consume", () ->
-                    new ParticleType<RitualConsumeParticleOptions>(false, RitualConsumeParticleOptions.DESERIALIZER) {
-                        @Override
-                        public Codec<RitualConsumeParticleOptions> codec() {
-                            return RitualConsumeParticleOptions.CODEC;
-                        }
-
-                        @Override
-                        public ParticleOptions.@NotNull Deserializer<RitualConsumeParticleOptions> getDeserializer() {
-                            return RitualConsumeParticleOptions.DESERIALIZER;
-                        }
-                    }
-            );
-
-    private static List<EnchantmentRecipe> _recipes = List.of();
 
     public static void init() {
-        BLOCKS.register();
-        ITEMS.register();
-        BLOCK_ENTITY_TYPES.register();
-        PARTICLES.register();
-    }
-
-    public static void reload(ResourceManager resourceManager) {
-        _recipes = RecipeHelper.loadRecipes(resourceManager)
-                .values()
-                .stream()
-                .filter(EnchantmentRecipe::isValidRecipe)
-                .toList();
-    }
-
-    public static List<EnchantmentRecipe> getEnchantmentRecipes() {
-        return List.of(new EnchantmentRecipe(
-                null,
-                new RecipeInputOrOutput(new EnchantmentIdentifier("minecraft:sharpness", 1), null),
-                new IngredientSlot[]{
-                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
-                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
-                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
-                        new IngredientSlot(new IngredientOption[]{new IngredientOption(new String[]{"minecraft:quartz"}, 0)}),
-                },
-                new RitualCost(3),
-                null,
-                "10s"
-        ));
+        LOGGER.info("Hello from EnchantmentRituals.");
+        LOGGER.debug("Debug message from EnchantmentRituals.");
+        EnchantmentRitualBlocks.register();
+        EnchantmentRitualItems.register();
+        EnchantmentRitualParticles.register();
     }
 
     public static void initClient() {
-        ParticleProviderRegistry.register(
-                RITUAL_CONSUME_PARTICLE.get(),
-                RitualConsumeParticleProvider::new
-        );
-
-        BlockEntityRendererRegistry.register(
-                ENCHANTMENT_PEDESTAL_BE.get(),
-                EnchantmentPedestalBlockEntityRenderer::new
-        );
-
-
+        EnchantmentRitualBlocks.registerClient();
+        EnchantmentRitualParticles.registerClient();
     }
 }

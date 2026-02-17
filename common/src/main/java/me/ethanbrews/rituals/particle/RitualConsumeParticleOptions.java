@@ -4,7 +4,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import me.ethanbrews.rituals.EnchantmentRituals;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,7 +40,7 @@ public class RitualConsumeParticleOptions implements ParticleOptions {
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return EnchantmentRituals.RITUAL_CONSUME_PARTICLE.get();
+        return EnchantmentRitualParticles.RITUAL_CONSUME_PARTICLE.get();
     }
 
     @Override

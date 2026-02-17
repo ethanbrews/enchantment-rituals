@@ -1,6 +1,6 @@
 package me.ethanbrews.rituals.compat.jei;
 
-import me.ethanbrews.rituals.EnchantmentRituals;
+import me.ethanbrews.rituals.item.EnchantmentRitualItems;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -27,7 +27,7 @@ public class RitualCategory implements IRecipeCategory<IEnchantmentRitualRecipe>
     public RitualCategory(IGuiHelper helper) {
         this.icon = helper.createDrawableIngredient(
                 VanillaTypes.ITEM_STACK,
-                new ItemStack(EnchantmentRituals.ENCHANTMENT_PEDESTAL_BLOCK_ITEM.get())
+                new ItemStack(EnchantmentRitualItems.ENCHANTMENT_PEDESTAL_BLOCK_ITEM.get())
         );
         this.slot = helper.getSlotDrawable();
         this.arrow = helper.getRecipeArrow();

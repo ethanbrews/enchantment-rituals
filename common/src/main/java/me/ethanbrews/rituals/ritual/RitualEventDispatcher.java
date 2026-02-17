@@ -1,13 +1,15 @@
 package me.ethanbrews.rituals.ritual;
 
+import me.ethanbrews.rituals.block.EnchantPedestalBlockEntity;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class RitualEventDispatcher {
-    private RitualTimeline timeline;
+    private final RitualTimeline timeline;
     private int tick;
     private RitualEvent currentEvent;
-    private Set<RitualEventHandler> handlers;
+    private final Set<RitualEventHandler> handlers;
 
     public RitualEventDispatcher(RitualTimeline timeline) {
         this.timeline = timeline;
@@ -21,6 +23,10 @@ public class RitualEventDispatcher {
         }
     }
 
+    public void injectEventNow(RitualEvent event) {
+        handleEvent(event);
+    }
+
     public void unsubscribe(RitualEventHandler handler) {
         handlers.remove(handler);
     }
@@ -31,27 +37,26 @@ public class RitualEventDispatcher {
             if (currentEvent == null) {
                 throw new RitualException("Ticking an expired ritual timeline");
             }
-            var frozenHandlers = new HashSet<>(handlers);
-            switch (currentEvent.getType()) {
-                case START_CONSUME_ITEM -> {
-                    frozenHandlers.forEach(h -> h.startItemConsumePhase(currentEvent.getPedestal()));
-                }
-                case END_CONSUME_ITEM -> {
-                    frozenHandlers.forEach(h -> h.endItemConsumePhase(currentEvent.getPedestal()));
-                }
-                case FAIL -> {
-                    frozenHandlers.forEach(h -> h.failure());
-                }
-                case SUCCEED -> {
-                    frozenHandlers.forEach(h -> h.success());
-                }
-            }
+            handleEvent(currentEvent);
         }
         tick++;
         if (currentEvent.getTime() > tick) {
             return;
         }
-        tick = 0;
         currentEvent = null;
+    }
+
+    private void handleEvent(RitualEvent event) {
+        var frozenHandlers = new HashSet<>(handlers);
+        switch (event.getType()) {
+            case START_CONSUME_ITEM -> {
+                var data = (ConsumeEventData) event.getData();
+                frozenHandlers.forEach(h -> h.startItemConsumePhase(data.pedestal(), data.ingredient()));
+            }
+            case END_CONSUME_ITEM -> frozenHandlers.forEach(h -> h.endItemConsumePhase((EnchantPedestalBlockEntity) event.getData()));
+            case CONSUME_XP -> frozenHandlers.forEach(h -> h.consumeXp((int) event.getData()));
+            case FAIL -> frozenHandlers.forEach(h -> h.failure((EnchantPedestalBlockEntity) event.getData()));
+            case SUCCEED -> frozenHandlers.forEach(RitualEventHandler::success);
+        }
     }
 }

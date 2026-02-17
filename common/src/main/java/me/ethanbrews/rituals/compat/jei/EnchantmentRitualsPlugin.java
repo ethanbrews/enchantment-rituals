@@ -1,6 +1,7 @@
 package me.ethanbrews.rituals.compat.jei;
 
 import me.ethanbrews.rituals.EnchantmentRituals;
+import me.ethanbrews.rituals.block.EnchantmentRitualBlocks;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -34,7 +35,7 @@ public class EnchantmentRitualsPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration reg) {
         reg.addRecipeCatalyst(
-                new ItemStack(EnchantmentRituals.ENCHANTMENT_PEDESTAL_BLOCK.get()),
+                new ItemStack(EnchantmentRitualBlocks.ENCHANTMENT_PEDESTAL_BLOCK.get()),
                 RITUAL_RECIPE_TYPE
         );
     }

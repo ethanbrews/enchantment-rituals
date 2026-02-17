@@ -11,6 +11,5 @@
     {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]},
     {"options": [{"items": ["minecraft:quartz"], "priority": 0 }]}
   ],
-  "cost": {"levels": 4},
-  "duration": "10s"
+  "cost": {"levels": 4}
 }

@@ -18,25 +18,40 @@ public class XpHelper {
 
         int currentTotalXP = getTotalXP(player);
         int targetLevel = player.experienceLevel - levels;
-        int targetTotalXP = getXPForLevel(targetLevel);
+        int targetTotalXP = levelsToXp(targetLevel);
 
         return currentTotalXP - targetTotalXP;
     }
 
-    // Helper: Get player's current total XP
-    private static int getTotalXP(Player player) {
-        return getXPForLevel(player.experienceLevel) +
-                (int)(player.experienceProgress * player.getXpNeededForNextLevel());
+    /**
+     * Get XP needed to go from level N to level N+1
+     */
+    public static int getXPNeededForLevel(int level) {
+        if (level >= 30) {
+            return 9 * level - 158;
+        } else if (level >= 15) {
+            return 5 * level - 38;
+        } else {
+            return 2 * level + 7;
+        }
     }
 
-    // Helper: Get cumulative XP for a level
-    private static int getXPForLevel(int level) {
-        if (level <= 16) {
-            return level * level + 6 * level;
-        } else if (level <= 31) {
-            return (int)(2.5 * level * level - 40.5 * level + 360);
+    /**
+     * Calculate total XP needed to reach a specific level from 0
+     */
+    public static int levelsToXp(int level) {
+        if (level >= 30) {
+            return (int) (4.5 * level * level - 162.5 * level + 2220);
+        } else if (level >= 15) {
+            return (int) (2.5 * level * level - 40.5 * level + 360);
         } else {
-            return (int)(4.5 * level * level - 162.5 * level + 2220);
+            return level * level + 6 * level;
         }
+    }
+
+    // Helper: Get player's current total XP
+    public static int getTotalXP(Player player) {
+        return levelsToXp(player.experienceLevel) +
+                (int)(player.experienceProgress * player.getXpNeededForNextLevel());
     }
 }

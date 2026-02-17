@@ -1,5 +1,6 @@
 package me.ethanbrews.rituals.fabric;
 
+import me.ethanbrews.rituals.recipe.EnchantmentRecipeRegistry;
 import net.fabricmc.api.ModInitializer;
 
 import me.ethanbrews.rituals.EnchantmentRituals;
@@ -29,7 +30,7 @@ public final class EnchantmentRitualsFabric implements ModInitializer {
 
                     @Override
                     public void onResourceManagerReload(ResourceManager resourceManager) {
-                        EnchantmentRituals.reload(resourceManager);
+                        EnchantmentRecipeRegistry.loadRecipes(resourceManager);
                     }
                 }
         );

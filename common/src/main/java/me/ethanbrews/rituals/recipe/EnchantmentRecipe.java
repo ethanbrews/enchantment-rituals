@@ -21,7 +21,7 @@ public record EnchantmentRecipe(
         @NotNull  IngredientSlot[] ingredients,
         @NotNull  RitualCost cost,
         @Nullable Float failureChance,
-        @NotNull  String duration
+        @Nullable String duration
 ) {
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -29,11 +29,16 @@ public record EnchantmentRecipe(
         return Math.min(0, XpHelper.getLevelCostInXP(player, cost.levels()));
     }
 
+    public int getXpCost() { return XpHelper.levelsToXp(cost.levels()); }
+
     public boolean canPlayerAffordXpCost(Player player) {
         return cost.levels() <= 0 || getXpCost(player) > 0;
     }
 
     public int getTickDuration() {
+        if (duration == null) {
+            return 20*(4 + (ingredients.length * 6));
+        }
         if (duration.endsWith("t")) {
             return Integer.parseInt(duration.substring(0, duration.length() - 1));
         } else if (duration.endsWith("s")) {
